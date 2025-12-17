@@ -56,7 +56,7 @@ String database(Map<String, Object> model) {
             );
         }
 
-        System.out.println ("Sydney Hurst")
+        System.out.println ("Sydney Hurst");
 
         model.put("records", output);
         return "database";
