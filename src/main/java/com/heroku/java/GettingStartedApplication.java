@@ -11,11 +11,14 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Map;
 import java.security.SecureRandom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SpringBootApplication
 @Controller
 public class GettingStartedApplication {
     private final DataSource dataSource;
+    private static final Logger logger = LoggerFactory.getLogger(GettingStartedApplication.class);
 
     @Autowired
     public GettingStartedApplication(DataSource dataSource) {
@@ -56,7 +59,7 @@ String database(Map<String, Object> model) {
             );
         }
 
-        System.out.println ("Sydney Hurst");
+        logger.info("Sydney Hurst");
 
         model.put("records", output);
         return "database";
