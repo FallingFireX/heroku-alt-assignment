@@ -28,26 +28,44 @@ public class GettingStartedApplication {
     }
 
     @GetMapping("/database")
-    String database(Map<String, Object> model) {
-        try (Connection connection = dataSource.getConnection()) {
-            final var statement = connection.createStatement();
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS table_timestamp_and_random_string (tick timestamp, random_string varchar(50))");
-            statement.executeUpdate("INSERT INTO table_timestamp_and_random_string VALUES (now(), '" + getRandomString() + "')");
 
-            final var resultSet = statement.executeQuery("SELECT tick FROM ticks");
-            final var output = new ArrayList<>();
-            while (resultSet.next()) {
-                output.add("Read from DB: " + resultSet.getTimestamp("tick"));
-            }
+String database(Map<String, Object> model) {
+    try (Connection connection = dataSource.getConnection()) {
+        var statement = connection.createStatement();
 
-            model.put("records", output);
-            return "database";
+        statement.executeUpdate(
+            "CREATE TABLE IF NOT EXISTS table_timestamp_and_random_string (" +
+            "tick timestamp, random_string varchar(50))"
+        );
 
-        } catch (Throwable t) {
-            model.put("message", t.getMessage());
-            return "error";
+        statement.executeUpdate(
+            "INSERT INTO table_timestamp_and_random_string VALUES (now(), '" + getRandomString() + "')"
+        );
+
+        var resultSet = statement.executeQuery(
+            "SELECT tick, random_string FROM table_timestamp_and_random_string ORDER BY tick DESC"
+        );
+
+        var output = new ArrayList<String>();
+        while (resultSet.next()) {
+            output.add(
+                "Read from DB: " +
+                resultSet.getTimestamp("tick") +
+                " " +
+                resultSet.getString("random_string")
+            );
         }
+
+        model.put("records", output);
+        return "database";
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        model.put("message", e.getMessage());
+        return "error";
     }
+}
+
 
     private static String getRandomString() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
